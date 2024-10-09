@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Khan Muhammad Halepoto">
+    <title>Balloon Pop Game</title>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #bcaac7, #79ddfc);
+            font-family: cursive;
+            margin: 20px;
+            overflow: hidden;
+        }
+        .navBar {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background-color: #f8def4;
+            font-size: 30px;
+            border-radius: 15px;
+        }
+
+        .bimage {
+            padding: 20px;
+        }
+
+        .playarea {
+            height: 90vh;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ktag {
+            opacity: 50%;
+            font-size: 15px;
+        }
+
+        #playbutton {
+            background-color: #e3fa12;
+            border-radius: 15px;
+            border: none;
+            color: rgb(8, 8, 8);
+            padding: 15px 32px;
+            margin: 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px;
+            width: 170px;
+            cursor: pointer;
+            font-family: cursive;
+        }
+
+        #playbutton:hover {
+            background-color: #b4fa12;
+            transform: scale(1.05);
+        }
+
+        .balloon {
+            border: 2px solid black;
+            border-radius: 50%;
+            width: 80px;
+            height: 110px;
+            position: absolute;
+            opacity: 100%;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: moveToTop 5s linear infinite;
+            cursor: pointer;
+        }
+
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 10px solid black;
+        }
+
+        .balloon2 {
+            border: 2px solid black;
+            background-color: red;
+            border-radius: 50%;
+            width: 65px;
+            height: 90px;
+            position: sticky;
+            margin-bottom: 35px;
+            opacity: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .balloon2::before {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: 8px solid black;
+        }
+
+        .aftergamemsg {
+            display: none;
+        }
+
+        @keyframes moveToTop {
+            from {
+                bottom: 0;
+            }
+            to {
+                bottom: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navBar">
+        <div id="lives">Lives: <span id="livesCount">5</span></div>
+        <div id="score">Score: <span id="scoreCount">0</span></div>
+    </nav>
+
+    <div class="playarea">
+        <div align="center" class="instructions">
+            <div class="balloon2"></div>
+            <h2>Welcome to the Balloon Pop Game!</h2>
+            <p>
+                Your goal is simple: Pop as many balloons as you can by clicking on them. 
+                For each balloon you pop, you’ll earn 10 points!
+            </p>
+            <p>
+                Be careful! Each balloon that reaches the top of the screen without being popped 
+                will cost you a life. You have a total of 5 lives, so make each click count!
+            </p>
+            <p>Are you ready to test your reflexes and score as high as possible? Click the Play button to begin!</p>
+            <p class="ktag">Made By Khanm</p>
+        </div>
+
+        <div align="center" class="aftergamemsg">
+            <div class="balloon2"></div>
+            <h1>Game Over!</h1>
+            <h2>Score: <span id="prevScore">0</span></h2>
+            <p id="msg"></p>
+            <p>Let's beat that!</p>
+       </div>
+        <button id="playbutton" onclick="startGame()">Play!</button>
+    </div>
+
+    <script>
+        let playarea = document.getElementsByClassName("playarea")[0];
+        let lives = document.getElementById("livesCount");
+        let score = document.getElementById("scoreCount");
+        let playbutton = document.getElementById("playbutton");
+        let instructions = document.getElementsByClassName("instructions")[0];
+        let aftergamemsg = document.getElementsByClassName("aftergamemsg")[0];
+        let prevScore = document.getElementById("prevScore");
+        let msg = document.getElementById("msg");
+
+        function startGame() {
+            lives.innerHTML = 5;
+            score.innerHTML = 0;
+            
+            playbutton.style.visibility = "hidden";
+            instructions.style.display = "none";
+            aftergamemsg.style.display = "none";
+
+            balloonInterval = setInterval(() => {
+                addBalloon();
+            }, 1000);
+        }
+
+        function checkLives() {
+            if(lives.innerHTML=="0")
+            {
+                let balloons = document.querySelectorAll(".balloon");
+                balloons.forEach(balloon => balloon.remove());
+
+                clearInterval(balloonInterval);
+
+                aftergamemsg.style.display = "block";
+                prevScore.innerHTML = score.innerHTML;
+                playbutton.style.visibility = "visible";
+                playbutton.innerHTML = "Play Again!";
+
+                if(parseInt(prevScore.innerHTML)<80)
+                {
+                    msg.innerHTML = prevScore.innerHTML+"??? Ok That's BADD!!";
+                }
+                else if(parseInt(prevScore.innerHTML)>80 && parseInt(prevScore.innerHTML)<150)
+                {
+                    msg.innerHTML = "Mhmmmmm Not Bad..";
+                }
+                else
+                {
+                    msg.innerHTML = "Exellent!!";
+                }
+                
+                lives.innerHTML = 5;
+                score.innerHTML = 0;
+            }
+        }
+
+        function addBalloon() {
+            let balloon = document.createElement("div");
+            balloon.classList.add("balloon");
+            balloon.style.backgroundColor = "#"+Math.floor(Math.random()*16777215).toString(16);
+            balloon.style.left = Math.random() * (window.innerWidth - 100)+"px";
+            playarea.appendChild(balloon);
+            balloon.addEventListener("click", popped);
+
+            setTimeout(() => {
+                if (playarea.contains(balloon)) {
+                    balloon.remove();
+                    lives.innerHTML = parseInt(lives.innerHTML)-1;
+                    checkLives();
+                }
+            }, 5000);
+        }
+
+        function popped() {
+            score.innerHTML = parseInt(score.innerHTML)+10;
+            this.remove();
+        }
+    </script>
+</body>
+</html>
